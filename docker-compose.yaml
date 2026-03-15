@@ -1,0 +1,32 @@
+version: "3.8"
+networks:
+  es:
+services:
+  elasticsearch:
+    image: elasticsearch:7.17.28
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    restart: always
+    networks:
+      - "es"
+    environment:
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "http.host=0.0.0.0"
+      - "TZ=Asia/Shanghai"
+    volumes:
+      - ./es-with-ik/plugins:/usr/share/elasticsearch/plugins
+  kibana:
+    image: kibana:7.17.28
+    restart: always
+    ports:
+      - "5601:5601"
+    environment:
+      - "TZ=Asia/Shanghai"
+      - "I18N_LOCALE=zh-CN"
+      - "ELASTICSEARCH_HOSTS=http://elasticsearch:9200"
+    networks:
+      - "es"
+    depends_on: 
+      - elasticsearch
